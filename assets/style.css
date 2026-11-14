@@ -1,0 +1,939 @@
+/* NeuroTrajectory - Step 4 dashboard */
+
+:root {
+    --page-bg: #f5f7fb;
+    --panel-bg: #ffffff;
+    --text: #1f2937;
+    --muted: #667085;
+    --border: #e4e7ec;
+    --shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+    --radius: 12px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.app-shell {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 22px;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.app-title {
+    margin: 0 0 4px;
+    font-size: 30px;
+    line-height: 1.1;
+}
+
+.app-subtitle {
+    margin: 0;
+    color: var(--muted);
+    max-width: 760px;
+}
+
+.header-meta {
+    text-align: right;
+}
+
+.header-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.header-note {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.filter-panel {
+    display: grid;
+    grid-template-columns: 1.3fr 0.75fr 1.05fr 0.9fr 1.05fr 1.0fr auto;
+    gap: 14px;
+    align-items: end;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+.filter-item {
+    min-width: 0;
+}
+
+.filter-label,
+.control-caption,
+.panel-label {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 7px;
+    color: #344054;
+}
+
+.inline-checklist label {
+    margin-right: 12px;
+    font-size: 13px;
+}
+
+.filter-action {
+    display: flex;
+    align-items: flex-end;
+}
+
+.reset-button {
+    border: 1px solid #d0d5dd;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-weight: 650;
+}
+
+.reset-button:hover {
+    background: #f9fafb;
+}
+
+.status-row {
+    display: grid;
+    grid-template-columns: 0.55fr 1fr 2fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.status-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 13px 15px;
+    min-height: 76px;
+}
+
+.status-number {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.status-label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 3px;
+}
+
+.status-secondary {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.panel {
+    min-width: 0;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.panel-wide,
+.panel-full {
+    grid-column: 1 / -1;
+}
+
+.panel-toolbar,
+.details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px 0;
+}
+
+.metric-dropdown {
+    width: 220px;
+}
+
+.selection-note {
+    color: var(--muted);
+    font-size: 12px;
+    text-align: right;
+}
+
+@media (max-width: 1050px) {
+    .filter-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .status-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 800px) {
+    .app-shell {
+        padding: 12px;
+    }
+
+    .app-header {
+        flex-direction: column;
+    }
+
+    .header-meta {
+        text-align: left;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-wide,
+    .panel-full {
+        grid-column: auto;
+    }
+}
+
+
+/* Step 4.1 refinements */
+
+.subject-control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.subject-control-header .control-caption {
+    margin-bottom: 0;
+}
+
+.clear-selection-button {
+    border: none;
+    background: transparent;
+    padding: 2px 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #667085;
+    cursor: pointer;
+}
+
+.clear-selection-button:hover {
+    color: #1f2937;
+    text-decoration: underline;
+}
+
+.status-secondary + .status-secondary {
+    margin-top: 1px;
+}
+
+.js-plotly-plot .plotly .legendtext {
+    font-size: 11px !important;
+}
+
+
+/* Step 4.2 */
+
+.filter-note {
+    margin-top: 5px;
+    min-height: 15px;
+    font-size: 11px;
+    color: #667085;
+}
+
+.subject-control .Select-value-label {
+    font-size: 12px;
+}
+
+.subject-control {
+    min-width: 0;
+}
+
+
+/* Step 4.3 interaction polish */
+
+.interaction-message {
+    min-height: 20px;
+    margin: -2px 2px 10px;
+    padding-left: 4px;
+    color: #667085;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@media (max-width: 800px) {
+    .filter-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .status-row {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-toolbar,
+    .details-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .metric-dropdown {
+        width: 100%;
+    }
+
+    .selection-note {
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .subject-control-header {
+        align-items: flex-start;
+    }
+
+    .app-title {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 520px) {
+    .app-shell {
+        padding: 8px;
+    }
+
+    .filter-panel,
+    .status-card {
+        padding: 11px;
+    }
+
+    .inline-checklist {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .inline-checklist label {
+        margin-right: 8px;
+    }
+}
+
+
+/* Step 6 — linked subject selection */
+
+.linked-caption {
+    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #667085;
+}
+
+@media (max-width: 800px) {
+    .linked-caption {
+        font-size: 11px;
+    }
+}
+
+
+/* Step 7 — brushing / multi-selection */
+
+.distribution-grouping {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #475467;
+}
+
+.distribution-grouping label {
+    margin-right: 12px;
+}
+
+.interaction-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: -2px 2px 10px;
+}
+
+.interaction-row .interaction-message {
+    margin: 0;
+    min-height: 20px;
+}
+
+.brush-hint {
+    color: #667085;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+@media (max-width: 800px) {
+    .interaction-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .brush-hint {
+        white-space: normal;
+    }
+
+    .distribution-grouping {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}
+
+
+/* Step 8 — comparison states */
+
+.comparison-state-strip {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
+    gap: 10px;
+    align-items: stretch;
+    margin: 8px 2px 12px;
+}
+
+.state-card {
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.state-full {
+    background: #f9fafb;
+}
+
+.state-filtered {
+    border-width: 1.5px;
+}
+
+.state-selected {
+    border-width: 2px;
+}
+
+.state-label {
+    color: #667085;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.state-value {
+    margin-top: 2px;
+    color: #101828;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.state-role {
+    margin-top: 2px;
+    color: #667085;
+    font-size: 11px;
+}
+
+.state-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #98a2b3;
+    font-size: 18px;
+}
+
+@media (max-width: 800px) {
+    .comparison-state-strip {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .state-arrow {
+        transform: rotate(90deg);
+        min-height: 16px;
+    }
+}
+
+
+/* Final presentation refinement — Phase 1 */
+.orientation-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 11px 14px;
+    margin-bottom: 10px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.workflow-block {
+    min-width: 0;
+}
+
+.orientation-label {
+    color: #667085;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.workflow-text {
+    margin-top: 2px;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.measure-help {
+    color: #344054;
+    font-size: 12px;
+}
+
+.measure-help summary {
+    cursor: pointer;
+    font-weight: 750;
+}
+
+.definition-grid {
+    position: absolute;
+    right: 22px;
+    z-index: 20;
+    width: min(540px, calc(100vw - 44px));
+    margin-top: 8px;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid #d0d5dd;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+    line-height: 1.55;
+}
+
+.active-filter-summary {
+    margin: 0 2px 10px;
+    color: #475467;
+    font-size: 12px;
+}
+
+.active-filter-counts {
+    color: #101828;
+    font-weight: 700;
+}
+
+.distribution-help {
+    margin-top: 3px;
+    color: #667085;
+    font-size: 10px;
+}
+
+@media (max-width: 800px) {
+    .orientation-panel {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .definition-grid {
+        position: static;
+        width: 100%;
+        margin-top: 8px;
+        box-shadow: none;
+    }
+}
+
+/* ========================================================
+   FINAL PRESENTATION POLISH — PHASE 2
+   ======================================================== */
+
+.app-header {
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%);
+    border: 1px solid var(--border);
+    border-left: 5px solid #0072B2;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.app-title {
+    font-size: 34px;
+    letter-spacing: -0.025em;
+    color: #101828;
+}
+
+.app-tagline {
+    margin: 2px 0 6px;
+    max-width: 900px;
+    color: #344054;
+    font-size: 15px;
+    font-style: italic;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.app-subtitle {
+    max-width: 930px;
+    color: #667085;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.header-meta {
+    min-width: 210px;
+}
+
+.header-badge {
+    border-color: #b2ddff;
+    background: #eff8ff;
+    color: #175cd3;
+}
+
+.header-note {
+    max-width: 220px;
+    margin-left: auto;
+    color: #475467;
+    line-height: 1.35;
+}
+
+.orientation-panel {
+    background: #fbfcfe;
+}
+
+.workflow-text {
+    font-size: 13px;
+}
+
+.active-filter-summary {
+    padding: 7px 10px;
+    background: #f9fafb;
+    border: 1px solid #eaecf0;
+    border-radius: 8px;
+}
+
+.panel {
+    transition: box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.panel:hover {
+    border-color: #d0d5dd;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06);
+}
+
+.distribution-help {
+    max-width: 620px;
+    line-height: 1.35;
+}
+
+@media (max-width: 1000px) {
+    .app-header {
+        flex-direction: column;
+    }
+
+    .header-meta {
+        width: 100%;
+        min-width: 0;
+        text-align: left;
+    }
+
+    .header-note {
+        max-width: none;
+        margin-left: 0;
+    }
+}
+
+/* ========================================================
+   PHASE 3: FINAL INTRO + YEARS-FROM-BASELINE EMPHASIS
+   ======================================================== */
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 28px;
+    padding: 20px 22px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%);
+    border: 1px solid var(--border);
+    border-left: 5px solid #0072B2;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.header-copy {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.app-title {
+    margin: 0 0 4px;
+    font-size: 36px;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: #101828;
+}
+
+.app-tagline {
+    margin: 2px 0 7px;
+    max-width: 1080px;
+    color: #344054;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.app-subtitle {
+    margin: 0;
+    max-width: 1080px;
+    color: #667085;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.header-meta {
+    min-width: 235px;
+    text-align: right;
+}
+
+.header-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border: 1px solid #b2ddff;
+    background: #eff8ff;
+    color: #175cd3;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.header-note {
+    margin-top: 7px;
+    margin-left: auto;
+    max-width: 250px;
+    color: #475467;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.orientation-panel {
+    align-items: flex-start;
+}
+
+.time-abstraction-note {
+    margin-top: 6px;
+    color: #475467;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.time-abstraction-note strong {
+    color: #175cd3;
+}
+
+@media (max-width: 1000px) {
+    .app-header {
+        flex-direction: column;
+    }
+
+    .header-meta {
+        width: 100%;
+        min-width: 0;
+        text-align: left;
+    }
+
+    .header-note {
+        max-width: none;
+        margin-left: 0;
+    }
+}
+
+/* ========================================================
+   PHASE 4: TRAJECTORY HOVER + VISIT-GAP GUIDANCE
+   ======================================================== */
+
+/* ========================================================
+   PHASE 7: EXPLICIT TRAJECTORY FOCUS CONTROL
+   ======================================================== */
+
+.trajectory-focus-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+    align-items: end;
+    gap: 18px;
+    margin: 0 0 8px;
+    padding: 11px 12px;
+    background: #ffffff;
+    border: 1px solid #d0d5dd;
+    border-left: 4px solid #0072B2;
+    border-radius: 8px;
+}
+
+.trajectory-focus-help {
+    color: #667085;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.trajectory-focus-dropdown {
+    min-width: 240px;
+}
+
+@media (max-width: 800px) {
+    .trajectory-focus-bar {
+        grid-template-columns: 1fr;
+    }
+
+    .trajectory-focus-dropdown {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+/* ========================================================
+   PHASE 9: ACTIVE COHORT SUMMARY STATISTICS
+   ======================================================== */
+
+.cohort-summary-statistics {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(92px, 1fr));
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+.summary-stat-card {
+    min-width: 0;
+    padding: 9px 10px 8px;
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 9px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+}
+
+.summary-stat-label {
+    color: #667085;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.summary-stat-value {
+    margin-top: 2px;
+    color: #101828;
+    font-size: 19px;
+    font-weight: 750;
+    line-height: 1.15;
+}
+
+.summary-stat-note {
+    margin-top: 2px;
+    color: #98a2b3;
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+@media (max-width: 1250px) {
+    .cohort-summary-statistics {
+        grid-template-columns: repeat(4, minmax(120px, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .cohort-summary-statistics {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
+}
+
+/* ========================================================
+   PHASE 10: REDUNDANCY CLEANUP
+   ======================================================== */
+
+.status-row-streamlined {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.32fr) minmax(0, 0.68fr);
+    gap: 14px;
+    align-items: stretch;
+}
+
+.status-row-streamlined .status-card {
+    min-height: 0;
+}
+
+.scatter-control {
+    padding: 14px 16px;
+}
+
+.comparison-state-strip {
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.state-card {
+    padding: 9px 12px;
+    min-height: 0;
+}
+
+.state-label {
+    font-size: 10px;
+    line-height: 1.15;
+}
+
+.state-value {
+    margin-top: 2px;
+    font-size: 18px;
+    line-height: 1.1;
+}
+
+.state-role {
+    margin-top: 2px;
+    font-size: 10px;
+    line-height: 1.2;
+}
+
+.state-arrow {
+    font-size: 20px;
+}
+
+.active-filter-summary {
+    margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+    .status-row-streamlined {
+        grid-template-columns: 1fr;
+    }
+}
